@@ -1,0 +1,107 @@
+#include <iostream>
+#include <SFML/Graphics.hpp>
+#include <stdlib.h>
+#include <time.h>
+using namespace sf;
+
+int main()
+{
+	RenderWindow window(VideoMode(640, 480), "Lesson 5. kychka-pc.ru");
+
+	Image turtleimage;
+	turtleimage.loadFromFile("images/3.png"); // загружаем в него файл
+	turtleimage.createMaskFromColor(Color(0, 0, 0, 0), 0); // убирает белый цвет (фон), правда некачественно
+	
+	Texture turtletexture; // создаеи объект texture
+	turtletexture.loadFromImage(turtleimage); // передаем в него объект image 
+	
+	Sprite turtlesprite; // создаем объект sprite
+	turtlesprite.setTexture(turtletexture); // передаем в него объект texture
+	turtlesprite.setTextureRect(IntRect(86, 145, 76, 63));
+	turtlesprite.setPosition(200, 200); // задаем начальные координаты появления спрайта
+	
+	float currentFrame = 0; // хранит текущий кадр
+	Clock clock; //создаем переменную времени, т.о. привязка ко времени(а не загруженности/мощности процессора).
+
+	while (window.isOpen()) {
+		float time = clock.getElapsedTime().asMicroseconds(); //дать прошедшее время в микросекундах
+		clock.restart(); //перезагружает время
+		time = time / 800; //скорость игры
+		
+		//  TELEPORT
+		//
+		//turtleTeleportTimer += time;//прибавляем к нашей переменной time
+		//	std::srand(unsigned(std::time(0)));
+		//float turtleTeleportTimer = 0; // создаем для примера телепортации героя через 3 секунды
+		//int random_variable = std::rand();
+		//int x = rand() % 640;
+		//int y = rand() % 480;
+		//if (turtleTeleportTimer > 3000) { turtlesprite.setPosition(x, y); turtleTeleportTimer = 0; } //если таймертелепорта больше 3000 (это примерно 3 секунды), то телепортируем героя и обнуляем таймер телепортации
+
+
+		//std::cout << time << "\n"; //смотрим, как живет время (перезагружается, как видим)
+		
+		Event event;
+		while (window.pollEvent(event)) {
+			if (event.type == Event::Closed)
+				window.close();
+		}
+
+		// ANIMATION
+
+		if ((Keyboard::isKeyPressed(Keyboard::Left) || (Keyboard::isKeyPressed(Keyboard::A)))) {
+			currentFrame += 0.005 * time; // служит для прохождения по кадрам. Переменная доходит до трех, суммируя произведение времени и скорости. Изменив 0.005, можно изменить скорость анимации
+			if (currentFrame > 3) currentFrame -= 3; // если пришли к третьему кадру - откидываемся назад
+			turtlesprite.setTextureRect(IntRect(74 * int(currentFrame), 355, 74, 62));
+			turtlesprite.move(-0.1*time, 0); // происходит движение персонажа влево
+		}
+			//{ turtlesprite.move(-0.1*time, 0); } //первая координата Х отрицательна =>идём влево
+		if ((Keyboard::isKeyPressed(Keyboard::Right) || (Keyboard::isKeyPressed(Keyboard::D)))) {
+			currentFrame += 0.005 * time;
+			if (currentFrame > 3) currentFrame -= 3; // если пришли к третьему кадру - откидываемся назад
+			turtlesprite.setTextureRect(IntRect(74 * int(currentFrame), 290, 74, 62));
+			turtlesprite.move(0.1*time, 0); // происходит движение персонажа вправо
+		} //первая координата Х положительна =>идём вправо
+		if (Keyboard::isKeyPressed(Keyboard::Up) || (Keyboard::isKeyPressed(Keyboard::W))) {
+			currentFrame += 0.005*time; //служит для прохождения по "кадрам". переменная доходит до трех суммируя произведение времени и скорости. изменив 0.005 можно изменить скорость анимации
+			if (currentFrame > 3) currentFrame -= 3; // если пришли к третьему кадру - откидываемся назад.
+			turtlesprite.setTextureRect(IntRect(72 * int(currentFrame), 219, 73, 61)); //проходимся по координатам Х. получается 0,96,96*2, и опять 0
+			turtlesprite.move(0, -0.1*time);//происходит само движение персонажа вверх
+		} //первая координата Х положительна =>идём вправо
+		if (Keyboard::isKeyPressed(Keyboard::Down) || (Keyboard::isKeyPressed(Keyboard::S))) {
+			currentFrame += 0.005*time; //служит для прохождения по "кадрам". переменная доходит до трех суммируя произведение времени и скорости. изменив 0.005 можно изменить скорость анимации
+			if (currentFrame > 3) currentFrame -= 3; //если пришли к третьему кадру - откидываемся назад.
+			turtlesprite.setTextureRect(IntRect(72 * int(currentFrame), 4, 73, 61)); //проходимся по координатам Х. получается 0,96,96*2,и опять 0
+			turtlesprite.move(0, 0.1*time);//происходит само движение персонажа вниз
+		}
+
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+			turtlesprite.setColor(Color::Red);
+		}
+
+		window.clear();
+		window.draw(turtlesprite); // выводим sprite на экран
+		window.display();
+	}
+
+	// circle 
+	//
+	//CircleShape shape(100.f);
+	//shape.setFillColor(Color::Blue);
+	//
+	//while (window.isOpen())
+	//{
+	//	Event event;
+	//	while (window.pollEvent(event))
+	//	{
+	//		if (event.type == sf::Event::Closed) 
+	//			window.close();
+	//	}
+	//
+	//	window.clear();
+	//	window.draw(shape);
+	//	window.display();
+	//}
+
+	return 0;
+}
